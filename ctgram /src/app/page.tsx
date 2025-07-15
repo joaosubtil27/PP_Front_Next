@@ -1,14 +1,24 @@
 "use client"
 import Image from "next/image"
+import Link from "next/link"
+
 import { useState } from "react"
 import { Input } from "../components/Input"
 import { Button } from "../components/Button"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+
 import type React from "react"
+
 export default function Home() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const path = usePathname();
+  const query = useSearchParams();
+  const page = query.get("page");
+  const router = useRouter();
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -25,7 +35,8 @@ export default function Home() {
           <Button type="submit" isLoading={isLoading}> Entrar </Button>
 
           <p className="text-xs">Ainda não tem uma conta?</p>
-          <Button type="submit" isLoading={isLoading}> Cadrastre-se </Button>
+
+          <Button isLoading={isLoading} onClick={() => {router.push("/Cadastro")}}>Cadrastre-se</Button>
 
         </form>
       </main>
