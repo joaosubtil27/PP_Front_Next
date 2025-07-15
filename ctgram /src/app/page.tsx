@@ -9,6 +9,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import type React from "react"
 
+
 export default function Home() {
 
   const [email, setEmail] = useState("");
@@ -32,13 +33,14 @@ export default function Home() {
           <Input required legend="E-mail" type="email" placeholder="seu@email.com" onChange={(e) => setEmail(e.target.value)} />
           <Input required legend="Senha" type="password" placeholder="Senha" onChange={(e) => setPassword(e.target.value)} />
 
-          <Button type="submit" isLoading={isLoading}> Entrar </Button>
+          <Button type="submit" isLoading={isLoading}>Entrar</Button>
 
-          <p className="text-xs">Ainda não tem uma conta?</p>
+          <p className="text-xs -mb-3">Ainda não tem uma conta?</p>
 
           <Button isLoading={isLoading} onClick={() => {router.push("/Cadastro")}}>Cadrastre-se</Button>
 
         </form>
+        
       </main>
     </div>
   )
