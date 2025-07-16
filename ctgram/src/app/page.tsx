@@ -26,9 +26,6 @@ export default function Home() {
     alert("Enviado!")
   }
   return (
-    <div className="h-screen flex flex-row justify-items-start">
-      <Sidebar />
-
       <div className="w-screen h-screen flex flex-col items-center justify-center bg-gray-100">
         <main className="bg-gray-300 w-max p-10 rounded-md flex items-center flex-col md:min-w-[462px]">
           <Image src="https://www.ctjunior.com.br/images/logo/logo-branca-reta-noSlogan.svg" width={300} height={120.75} alt="" className="pb-3" />
@@ -46,6 +43,5 @@ export default function Home() {
 
         </main>
       </div>
-    </div>
   )
 }
