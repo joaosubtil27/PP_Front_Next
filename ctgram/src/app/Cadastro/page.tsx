@@ -4,11 +4,12 @@ import { useEffect, useState } from "react"
 
 import { Input } from "../../components/Input"
 import { Button } from "../../components/Button"
-
+import { api } from "../../services/api"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { z, ZodError } from "zod"
 import Image from "next/image"
 import type React from "react"
+import Link from "next/link"
 
 const signUpSchema = z.object({
     nome: z.string().trim().min(1, { message: "Informe o nome" }),
@@ -35,15 +36,15 @@ export default function Cadastro() {
 
   useEffect(() => {
     try {
-      // Tenta validar o esquema com os valores atuais
+
       signUpSchema.parse({ nome, email, password, npassword });
-      setForm(true); // Se passou, o formulário é válido
+      setForm(true); 
     } catch (error) {
-      setForm(false); // Se deu erro, o formulário é inválido
+      setForm(false); 
     }
   }, [nome, email, password, npassword]);
 
-    function onSubmit(e: React.FormEvent) {
+    async function onSubmit(e: React.FormEvent) {
         e.preventDefault()
         try {
             setIsLoading(true)
@@ -54,6 +55,12 @@ export default function Cadastro() {
                 password,
                 npassword,
             })
+            // await api.post("/users", data);
+
+            // if(confirm("Cadastro realizado!. Ir para a página inicial?")){
+            //     <Link href="/"/>
+            // }
+
         } catch (error) {
             if (error instanceof ZodError) {
                 return alert(error.issues[0].message)

@@ -3,3 +3,30 @@
 @theme {
     --default-font-family: "Montserrat", sans-serif;
 }
+
+#inicial {
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    background-color: #f3f4f6;
+}
+
+#site-sb {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    justify-items: start;
+    background-color: #f3f4f6;
+}
+
+#sb{
+    display: flex;
+    flex-direction: row;
+    justify-items: start;
+    padding-left: 10px;
+    padding-top: 30px;
+    gap: 30px;
+}
