@@ -9,7 +9,7 @@ export default function EditarFoto() {
   const [imgUrl, setImgUrl] = useState(IMAGEM_DEFAULT);
   const [campo, setCampo] = useState("");
 
-  const trocarImagem = (e: Event) => {
+  const trocarImagem = (e: React.FormEvent) => {
     e.preventDefault();
     if (campo.trim()) setImgUrl(campo.trim());
     setCampo('');
