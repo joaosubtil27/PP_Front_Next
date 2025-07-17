@@ -90,7 +90,7 @@ export default function Cadastro() {
                     <Input required legend="Digite a senha novamente" type="password" placeholder="Confirmação de Senha" onChange={(e) => setNewPassword(e.target.value)} />
                     <Button type="submit" isLoading={isLoading} disabled={!isFormValid}>Confirmar</Button>
 
-                    <Button type="button" isLoading={isLoading} onClick={() => { router.push("/") }}>Login</Button>
+                    <Button type="submit" isLoading={isLoading} onClick={() => { router.push("/") }}>Login</Button>
                 </form>
             </main>
         </div>
