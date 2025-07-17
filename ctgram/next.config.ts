@@ -2,23 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'http',
-        hostname: '**',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: '**',
-        port: '',
-        pathname: '/**',
-      },
-    ],
+    unoptimized: true, // APENAS esta linha dentro do objeto images
   },
 };
 
 export default nextConfig;
-
-
