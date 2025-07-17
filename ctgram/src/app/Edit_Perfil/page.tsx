@@ -7,9 +7,9 @@ import React from "react";
 import { Sidebar } from "@/components/Sidebar";
 
 export default function EditarFoto() {
-  const BACKEND_URL = "http://localhost:3000";
+  const BACKEND_URL = "http://localhost:3331";
 
-  const IMAGEM_DEFAULT_LOCAL = "/default-profile.png";
+  const IMAGEM_DEFAULT_LOCAL = "https://i.pinimg.com/736x/41/af/40/41af40966240f4b53abed779e59005ff.jpg";
 
   const [imgUrl, setImgUrl] = useState(IMAGEM_DEFAULT_LOCAL);
   const [campo, setCampo] = useState("");

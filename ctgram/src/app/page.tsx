@@ -4,9 +4,11 @@ import Image from "next/image"
 import { useState, useEffect } from "react"
 import { Input } from "../components/Input"
 import { Button } from "../components/Button"
+import { api } from "../services/api"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { z, ZodError } from "zod"
 import type React from "react"
+import { AxiosError } from "axios"
 
 const loginSchema = z.object({
   email: z.string().email({ message: "E-mail inválido" }),
@@ -27,15 +29,14 @@ export default function Home() {
 
   useEffect(() => {
     try {
-      // Tenta validar o esquema com os valores atuais
       loginSchema.parse({ email, password });
-      setForm(true); // Se passou, o formulário é válido
+      setForm(true);
     } catch (error) {
-      setForm(false); // Se deu erro, o formulário é inválido
+      setForm(false);
     }
   }, [email, password]);
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     try {
       setIsLoading(true)
@@ -44,11 +45,28 @@ export default function Home() {
         email,
         password,
       })
+
+      const response = await api.post("/login", { 
+        email: data.email,
+        password: data.password,
+      });
+
+      if (response.data.token) { 
+        localStorage.setItem('access_token', response.data.token);
+        alert("Login realizado com sucesso!");
+        router.push("/editar-foto");
+      } else {
+        alert("Token de acesso não recebido na resposta do login.");
+      }
+
     } catch (error) {
       if (error instanceof ZodError) {
-        return alert(error.issues[0].message)
+        return alert(error.issues[0].message);
       }
-      alert("Não foi possível cadastrar!");
+      if (error instanceof AxiosError) {
+        return alert(error.response?.data?.message || "Não foi possível fazer login. Credenciais inválidas.");
+      }
+      alert("Não foi possível fazer login!");
     }
     finally {
       setIsLoading(false)
@@ -62,11 +80,11 @@ export default function Home() {
           <Input required legend="E-mail" type="email" placeholder="seu@email.com" onChange={(e) => setEmail(e.target.value)} />
           <Input required legend="Senha" type="password" placeholder="Senha" onChange={(e) => setPassword(e.target.value)} />
 
-          <Button type="submit" isLoading={isLoading} disabled={!isFormValid} onClick={() => { router.push("/Cadastro") }}>Entrar</Button>
+          <Button type="submit" isLoading={isLoading} disabled={!isFormValid}>Entrar</Button>
 
           <p className="text-xs -mb-3">Ainda não tem uma conta?</p>
 
-          <Button isLoading={isLoading} onClick={() => { router.push("/Cadastro") }}>Cadrastre-se</Button>
+          <Button type="button" isLoading={isLoading} onClick={() => { router.push("/Cadastro") }}>Cadastre-se</Button>
 
         </form>
 
