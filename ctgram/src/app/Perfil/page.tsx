@@ -8,7 +8,6 @@ import { Post } from "../../components/Post"; // Importe o componente Post
 import { Sidebar } from "../../components/Sidebar"; // Importe a Sidebar
 
 // Defina a interface para o tipo de dado que você espera para cada post
-// Isso DEVE corresponder ao que seu backend retorna para um post (via FetchUserPostsController)
 interface UserPostData {
   id: string; // post_id no backend mapeia para id no frontend
   foto: string;
@@ -17,29 +16,69 @@ interface UserPostData {
   username: string; // O backend retorna 'username' diretamente no item do post
 }
 
-export default function PerfilPage() { // Renomeado para PerfilPage para clareza
-  const IMAGEM_PADRAO_USUARIO = "https://i.pinimg.com/736x/1a/a8/d7/1aa8d75f3498784bcd2617b3e3d1e0c4.jpg"; // URL de foto de perfil padrão
+export default function PerfilPage() {
+  // Alteração 1: Imagem padrão agora é um placeholder local para robustez
+  const IMAGEM_PADRAO_PLACEHOLDER = "/default-profile.png"; // Certifique-se que esta imagem existe em /public
 
-  // Estado para os posts do usuário
+  // Alteração 2: Novo estado para a URL da foto de perfil
+  const [profileImageUrl, setProfileImageUrl] = useState<string>(IMAGEM_PADRAO_PLACEHOLDER);
+  const [loadingProfileImage, setLoadingProfileImage] = useState<boolean>(true);
+  const [errorProfileImage, setErrorProfileImage] = useState<string | null>(null);
+
+  // Estado para os posts do usuário (existente)
   const [userPosts, setUserPosts] = useState<UserPostData[]>([]);
   const [loadingPosts, setLoadingPosts] = useState<boolean>(true);
   const [errorPosts, setErrorPosts] = useState<string | null>(null);
   const [loggedInUsername, setLoggedInUsername] = useState<string | null>(null);
-  // Efeito para buscar os posts do usuário ao carregar a página
+
+  // Efeito para buscar os posts do usuário e a foto de perfil ao carregar a página
   useEffect(() => {
-   // <<< ADICIONADO: Ler o username do localStorage ao carregar >>>
-   const storedUsername = localStorage.getItem('username');
+    // Leitura do username do localStorage (existente)
+    const storedUsername = localStorage.getItem('username');
     if (storedUsername) {
-     setLoggedInUsername(storedUsername);
-   }
+      setLoggedInUsername(storedUsername);
+    }
+
+    // Alteração 3: Nova função para buscar a foto de perfil do backend
+    async function fetchProfileImage() {
+      const token = localStorage.getItem('access_token'); // Pega o token para autenticar
+      if (!token) {
+        setProfileImageUrl(IMAGEM_PADRAO_PLACEHOLDER);
+        setErrorProfileImage("Faça login para ver a foto de perfil.");
+        setLoadingProfileImage(false);
+        return;
+      }
+
+      try {
+        setLoadingProfileImage(true);
+        setErrorProfileImage(null);
+        const response = await api.get('/photo'); // Chama o endpoint GET /photo
+        
+        if (response.data.foto) { // O backend deve retornar { foto: "URL" }
+          setProfileImageUrl(response.data.foto);
+        } else {
+          setProfileImageUrl(IMAGEM_PADRAO_PLACEHOLDER); // Fallback se não tiver foto no DB
+        }
+      } catch (err) {
+        if (err instanceof AxiosError && err.response) {
+          const backendMessage = (err.response.data as { message?: string | string[] })?.message;
+          setErrorProfileImage(`Erro ao carregar foto: ${Array.isArray(backendMessage) ? backendMessage.join(', ') : backendMessage || "Desconhecido"}`);
+        } else {
+          setErrorProfileImage(`Erro inesperado ao carregar foto: ${err instanceof Error ? err.message : "Desconhecido"}`);
+        }
+        setProfileImageUrl(IMAGEM_PADRAO_PLACEHOLDER); // Usa placeholder em caso de erro
+      } finally {
+        setLoadingProfileImage(false);
+      }
+    }
+
+    // Função existente para buscar os posts do usuário
     async function fetchUserPosts() {
       try {
         setLoadingPosts(true);
         setErrorPosts(null);
-        // Endpoint: GET /my-posts (do FetchUserPostsController)
         const response = await api.get('/my-posts'); 
         
-        // Mapeia os dados do backend para o formato esperado pelo frontend (UserPostData)
         const fetchedPosts = response.data.posts.map((item: any) => ({
           id: item.post_id,
           foto: item.foto,
@@ -53,11 +92,7 @@ export default function PerfilPage() { // Renomeado para PerfilPage para clareza
       } catch (err) {
         if (err instanceof AxiosError && err.response) {
           const backendMessage = (err.response.data as { message?: string | string[] })?.message;
-          if (Array.isArray(backendMessage)) {
-            setErrorPosts(`Erro ao carregar seus posts: ${backendMessage.join(', ')}`);
-          } else {
-            setErrorPosts(`Erro ao carregar seus posts: ${backendMessage || "Erro desconhecido do servidor."}`);
-          }
+          setErrorPosts(`Erro ao carregar seus posts: ${Array.isArray(backendMessage) ? backendMessage.join(', ') : backendMessage || "Desconhecido"}`);
         } else {
           setErrorPosts(`Não foi possível carregar seus posts! Erro inesperado: ${err instanceof Error ? err.message : "Desconhecido"}`);
         }
@@ -66,7 +101,9 @@ export default function PerfilPage() { // Renomeado para PerfilPage para clareza
       }
     }
 
-    fetchUserPosts();
+    // Chamada das funções no useEffect
+    fetchProfileImage(); // Alteração 4: Chamar a função para buscar a foto de perfil
+    fetchUserPosts(); // Chamada existente para buscar os posts
   }, []); // Roda apenas uma vez ao montar o componente
 
   return (
@@ -78,17 +115,25 @@ export default function PerfilPage() { // Renomeado para PerfilPage para clareza
 
         {/* Seção da Foto do Usuário e Nome */}
         <section className="mb-8 flex flex-col items-center">
-          <Image 
-            src={IMAGEM_PADRAO_USUARIO} // Usando imagem padrão. Se tiver uma URL real do usuário, substitua.
-            alt="Foto do usuário" 
-            width={150} 
-            height={150} 
-            className="rounded-full border-4 border-orange-500 mb-4" 
-            style={{ objectFit: 'cover' }}
-          />
+          {/* Alteração 5: Renderização condicional da Imagem */}
+          {loadingProfileImage ? (
+            <p>Carregando foto de perfil...</p>
+          ) : errorProfileImage ? (
+            <p className="text-red-500">{errorProfileImage}</p>
+          ) : (
+            <Image 
+              src={profileImageUrl} // AGORA USA A URL DINÂMICA DO ESTADO
+              alt="Foto do usuário" 
+              width={150} 
+              height={150} 
+              className="rounded-full border-4 border-orange-500 mb-4" 
+              style={{ objectFit: 'cover' }}
+            />
+          )}
+          
           {loggedInUsername ? (
-            <p className="text-gray-700 font-semibold text-xl">{loggedInUsername}</p> // <<< ADICIONADO: Exibe o username
-         ) : (
+            <p className="text-gray-700 font-semibold text-xl">{loggedInUsername}</p> 
+          ) : (
             <p className="text-gray-700 font-semibold text-xl">Carregando nome...</p>
           )}
         </section>
@@ -119,14 +164,17 @@ export default function PerfilPage() { // Renomeado para PerfilPage para clareza
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6"> {/* Layout de grade */}
             {!loadingPosts && !errorPosts && userPosts.map((post) => (
-<Post
-  key={post.id}
-  id={post.id}
-  foto={post.foto}
-  description={post.description}
-  createdAt={post.createdAt}
-  // Não passar 'author' aqui
-/>
+              <Post
+                key={post.id}
+                id={post.id}
+                foto={post.foto}
+                description={post.description}
+                createdAt={post.createdAt}
+                author={{ username: post.username }} // Alteração 6: Passar o username para o componente Post
+                // OBSERVAÇÃO: O COMPONENTE POST ESPERA A PROPRIEDADE 'author' COMO UM OBJETO { username: string }
+                // Certifique-se de que seu componente Post está atualizado para receber 'username: string' ou 'author: { username: string }'.
+                // Se o Post espera 'author', você deve passar: author={{ username: post.username }}
+              />
             ))}
           </div>
         </section>
