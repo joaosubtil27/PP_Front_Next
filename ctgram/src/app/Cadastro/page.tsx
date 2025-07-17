@@ -80,8 +80,8 @@ export default function Cadastro() {
         }
     }
     return (
-        <div className="w-screen h-screen flex flex-col items-center justify-center bg-gray-100">
-            <main className="bg-gray-300 w-max p-10 rounded-md flex items-center flex-col md:min-w-[462px]">
+        <div id="inicial">
+            <main id="box">
                 <Image src="https://www.ctjunior.com.br/images/logo/logo-branca-reta-noSlogan.svg" width={300} height={120.75} alt="" className="pb-3" />
                 <form onSubmit={onSubmit} className="w-full flex flex-col gap-5 items-center" >
                     <Input required legend="Nome" type="text" placeholder="Nome" onChange={(e) => setUsername(e.target.value)} />
@@ -90,7 +90,7 @@ export default function Cadastro() {
                     <Input required legend="Digite a senha novamente" type="password" placeholder="Confirmação de Senha" onChange={(e) => setNewPassword(e.target.value)} />
                     <Button type="submit" isLoading={isLoading} disabled={!isFormValid}>Confirmar</Button>
 
-                    <Button type="button" isLoading={isLoading} onClick={() => { router.push("/") }}>Login</Button>
+                    <Button type="submit" isLoading={isLoading} onClick={() => { router.push("/") }}>Login</Button>
                 </form>
             </main>
         </div>

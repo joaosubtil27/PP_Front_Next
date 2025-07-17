@@ -5,11 +5,12 @@
 }
 
 #inicial {
-    width: 100vw;
-    height: 100vh;
+    min-width: 100vw;
+    min-height: 100vh;
+    display: flex;
     flex-direction: column;
     align-items: center;
-    justify-items: center;
+    justify-content: center;
     background-color: #f3f4f6;
 }
 
@@ -22,7 +23,24 @@
     background-color: #f3f4f6;
 }
 
-#sb{
+#box {
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 40px;
+    border-radius: 6px;
+    background-color: #d1d5dc;
+
+    @media (width >=48rem
+    ) {
+        min-width: 462px;
+    }
+}
+
+
+#sb {
     display: flex;
     flex-direction: row;
     justify-items: start;

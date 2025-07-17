@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -7,11 +8,12 @@ import { api } from '../../services/api';
 import { AxiosError } from 'axios';
 import Image from 'next/image'; 
 
+
 interface PostData {
   id: string; 
   foto: string;
   description: string | null;
-  createdAt: string;
+  createdAt: string; 
   author: { 
     id?: string; 
     username: string;
@@ -32,14 +34,14 @@ export default function FeedPage() {
         
         const response = await api.get('/feed'); 
         
-       
+        
         const fetchedPosts = response.data.posts.map((item: any) => ({
           id: item.post_id, 
           foto: item.foto,
           description: item.description,
           createdAt: item.posted_at, 
           author: {
-            username: item.username, 
+            username: item.username,
           },
         }));
 
@@ -65,7 +67,7 @@ export default function FeedPage() {
   }, []); 
 
   return (
-    <div className="flex w-screen h-screen">
+    <div id="site-sb">
       <Sidebar />
       <main className="flex-1 flex-col p-8 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-6">Seu Feed</h1>
